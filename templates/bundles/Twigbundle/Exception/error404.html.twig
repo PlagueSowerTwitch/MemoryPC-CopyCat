@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Page non trouvée (404){% endblock %}
+
+{% block body %}
+    <section style="text-align: center; padding: 50px;">
+        <h1 style="font-size: 3em; color: #e74c3c;">404</h1>
+        <h2>Oups ! La page que vous cherchez n'existe pas.</h2>
+        <p>Il se peut que l'URL soit incorrecte ou que la page ait été supprimée.</p>
+        <a href="{{ path('home') }}" style="display: inline-block; margin-top: 20px; padding: 10px 20px; background: #3498db; color: white; text-decoration: none; border-radius: 5px;">
+            Retour à l'accueil
+        </a>
+    </section>
+{% endblock %}
