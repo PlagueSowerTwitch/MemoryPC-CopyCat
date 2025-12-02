@@ -1,0 +1,84 @@
+.account-page {
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.account-container {
+    display: flex;
+    gap: 50px;
+    max-width: 1000px;
+    width: 100%;
+}
+
+.login-section, .register-section {
+    flex: 1;
+    background-color: #f7f7f7;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+}
+
+h2 {
+    margin-bottom: 20px;
+    font-size: 20px;
+    color: #333;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+input {
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+button {
+    padding: 12px;
+    background-color: #1f1f1f;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+button:hover {
+    background-color: #333;
+}
+
+.error {
+    background-color: #ffcccc;
+    color: #900;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.invalid { color: red; }
+.valid { color: green; }
+
+#password-requirements {
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+#password-requirements p {
+    margin: 2px 0;
+}
+
+@media (max-width: 768px) {
+    .account-container {
+        flex-direction: column;
+    }
+}
+
+#password-requirements p {
+    margin: 2px 0;
+    font-size: 14px;
+}

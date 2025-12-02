@@ -6,6 +6,7 @@ use App\Repository\CartRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\User;
 
 #[ORM\Entity(repositoryClass: CartRepository::class)]
 class Cart
@@ -15,14 +16,12 @@ class Cart
     #[ORM\Column]
     private ?int $id = null;
 
-    /**
-     * @var Collection<int, Product>
-     */
     #[ORM\ManyToMany(targetEntity: Product::class, inversedBy: 'carts')]
     private Collection $HasProduct;
 
     #[ORM\OneToOne(inversedBy: 'cart', cascade: ['persist', 'remove'])]
-    private ?user $user_cart = null;
+    #[ORM\JoinColumn(name: 'user_cart_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    private ?User $user_cart = null;
 
     public function __construct()
     {
@@ -54,19 +53,17 @@ class Cart
     public function removeHasProduct(Product $hasProduct): static
     {
         $this->HasProduct->removeElement($hasProduct);
-
         return $this;
     }
 
-    public function getUserCart(): ?user
+    public function getUserCart(): ?User
     {
         return $this->user_cart;
     }
 
-    public function setUserCart(?user $user_cart): static
+    public function setUserCart(?User $user_cart): static
     {
         $this->user_cart = $user_cart;
-
         return $this;
     }
 }

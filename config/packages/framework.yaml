@@ -1,12 +1,23 @@
 # see https://symfony.com/doc/current/reference/configuration/framework.html
+# config/packages/framework.yaml
 framework:
     secret: '%env(APP_SECRET)%'
 
-    # Note that the session will be started ONLY if you read or write from it.
-    session: true
+    csrf_protection: true
 
-    #esi: true
-    #fragments: true
+    session:
+        # La session sera démarrée uniquement si nécessaire
+        handler_id: null
+        cookie_secure: true
+        cookie_httponly: true
+        cookie_samesite: lax
+
+    form: true
+
+    # Optionnel : ESI et fragments si utilisés
+    # esi: true
+    # fragments: true
+
 
 when@test:
     framework:

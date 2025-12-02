@@ -1,0 +1,44 @@
+# config/packages/nelmio_security.yaml
+nelmio_security:
+
+    clickjacking:
+        paths:
+            '^/.*': DENY
+
+    content_type:
+        nosniff: true
+
+    referrer_policy:
+        enabled: true
+        policies:
+            - 'no-referrer'
+            - 'strict-origin-when-cross-origin'
+
+    csp:
+        enabled: true
+        hosts: []
+        content_types: []
+        enforce:
+            default-src: ['self']
+
+            # ACTIVE LE NONCE AUTOMATIQUEMENT
+            script-src:
+                - 'self'
+                - 'nonce'
+
+            # POUR CSS externe → OK
+            style-src:
+                - 'self'
+
+            img-src:
+                - 'self'
+                - 'data:'
+
+            object-src:
+                - 'none'
+
+            base-uri:
+                - 'self'
+
+            frame-ancestors:
+                - 'none'

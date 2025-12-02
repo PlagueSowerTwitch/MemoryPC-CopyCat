@@ -1,0 +1,79 @@
+.account-page {
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.account-container {
+    width: 600px;
+    background: #f7f7f7;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.account-container h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.account-info form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.account-info label {
+    font-weight: bold;
+}
+
+.account-info input {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.account-info button {
+    padding: 12px;
+    background-color: #1f1f1f;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    margin-top: 10px;
+}
+
+.account-info button:hover {
+    background-color: #333;
+}
+
+.admin-button {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.admin-button button {
+    background-color: #007bff;
+}
+
+.admin-button button:hover {
+    background-color: #0056b3;
+}
+
+.flash-success {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.flash-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}

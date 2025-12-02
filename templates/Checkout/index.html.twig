@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}MemoryPC Clone{% endblock %}</title>
+    <link rel="stylesheet" href="{{ asset('build/Home.css') }}">
+    <script defer src="{{ asset('build/app.js') }}"></script>
+</head>
+
+<body>
+
+    {# HEADER COMMUN #}
+    {% include 'components/header.html.twig' %}
+
+    {# CONTENU SPÉCIFIQUE À CHAQUE PAGE #}
+    <main>
+        {% block body %}{% endblock %}
+    </main>
+
+</body>
+</html>

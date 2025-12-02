@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mentions légales{% endblock %}
+
+{% block stylesheets %}
+    {# Inclusion du CSS externe #}
+    <link rel="stylesheet" href="{{ asset('styles/legal.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="legal-page">
+    <h1>Mentions légales et protection des données</h1>
+
+    <section>
+        <h2>1. Gestionnaire du site</h2>
+        <p>Le site <strong>MemoryPC Clone</strong> est géré par <strong>Onveutvotreflouze&co</strong>.</p>
+        <p>Adresse : Chez moi<br>
+           Email : Onveutvotreflouze@gmail.com<br>
+           Téléphone : On en a pas</p>
+    </section>
+
+    <section>
+        <h2>2. Données collectées</h2>
+        <p>Nous collectons uniquement les informations nécessaires au fonctionnement de notre site et à la fourniture de nos services :</p>
+        <ul>
+            <li>Nom et prénom</li>
+            <li>Adresse e-mail</li>
+            <li>Mot de passe (haché et sécurisé)</li>
+            <li>Adresse de livraison</li>
+            <li>Historique des commandes et paniers</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>3. Utilisation des données</h2>
+        <p>Les données collectées servent à :</p>
+        <ul>
+            <li>Créer et gérer votre compte utilisateur</li>
+            <li>Assurer la livraison de vos commandes</li>
+            <li>Vous contacter pour des informations relatives à votre compte ou vos commandes</li>
+            <li>Améliorer nos services et vous proposer des offres adaptées</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>4. Durée de conservation</h2>
+        <p>Vos données sont conservées :</p>
+        <ul>
+            <li>Pour la durée nécessaire à la gestion de votre compte et de vos commandes</li>
+            <li>Pour respecter nos obligations légales et fiscales</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>5. Droits des utilisateurs</h2>
+        <ul>
+            <li>Droit d'accès</li>
+            <li>Droit de rectification</li>
+            <li>Droit à l'effacement</li>
+            <li>Droit à la limitation du traitement</li>
+            <li>Droit d'opposition</li>
+            <li>Droit à la portabilité</li>
+        </ul>
+        <p>Pour exercer vos droits, contactez : <strong>Onveutvotreflouze@gmail.com</strong>.</p>
+    </section>
+
+    <section>
+        <h2>6. Sécurité des données</h2>
+        <p>Nous mettons en œuvre des mesures techniques et organisationnelles pour protéger vos données.</p>
+    </section>
+
+    <section>
+        <h2>7. Modifications de la politique</h2>
+        <p>La version la plus récente est toujours disponible sur notre site.</p>
+    </section>
+</div>
+{% endblock %}

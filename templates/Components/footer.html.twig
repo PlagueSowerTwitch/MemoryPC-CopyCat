@@ -1,0 +1,32 @@
+<footer class="site-footer">
+    <div class="footer-container">
+        <div class="footer-column">
+            <h4>À propos</h4>
+            <ul>
+                <li><a href="{{ path('legal_mentions') }}">Mentions légales</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-column">
+            <h4>Mon compte</h4>
+            <ul>
+                <li><a href="{{ path('account_login') }}">Connexion</a></li>
+                <li><a href="{{ path('account_login') }}">Créer un compte</a></li>
+                <li><a href="{{ path('account') }}">Mon espace</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-column">
+            <h4>Suivez-nous</h4>
+            <ul>
+                <li><a href="#" target="_blank">Facebook</a></li>
+                <li><a href="#" target="_blank">Instagram</a></li>
+                <li><a href="#" target="_blank">Twitter</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>© {{ "now"|date("Y") }} - MonSite. Tous droits réservés.</p>
+    </div>
+</footer>

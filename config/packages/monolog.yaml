@@ -32,24 +32,41 @@ when@test:
 when@prod:
     monolog:
         handlers:
+            # Ne logue les messages qu'en cas d'erreur
             main:
                 type: fingers_crossed
                 action_level: error
-                handler: nested
+                handler: grouped
                 excluded_http_codes: [404, 405]
+                buffer_size: 50
                 channels: ["!deprecation"]
-                buffer_size: 50 # How many messages should be saved? Prevent memory leaks
-            nested:
+
+            # Regroupe les logs dans ses handlers (syslog + fichier)
+            grouped:
+                type: group
+                members: [error_log, file_log]
+
+            # Log les erreurs dans un fichier propre en prod
+            file_log:
+                type: stream
+                path: "%kernel.logs_dir%/prod_error.log"
+                level: error
+
+            # Log également dans stderr (utile sur un vrai serveur Linux)
+            error_log:
                 type: stream
                 path: php://stderr
-                level: debug
+                level: error
                 formatter: monolog.formatter.json
-            console:
-                type: console
-                process_psr_3_messages: false
-                channels: ["!event", "!doctrine"]
+
+            # Dépréciations → fichier dédié
             deprecation:
                 type: stream
+                path: "%kernel.logs_dir%/deprecations.log"
                 channels: [deprecation]
-                path: php://stderr
-                formatter: monolog.formatter.json
+                level: notice
+
+            # Console log minimal
+            console:
+                type: console
+                channels: ["!event", "!doctrine"]

@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block body %}
+<h1>Dashboard Admin</h1>
+
+{% for message in app.flashes('success') %}
+    <div style="color: green;">{{ message }}</div>
+{% endfor %}
+{% for message in app.flashes('error') %}
+    <div style="color: red;">{{ message }}</div>
+{% endfor %}
+
+<h2>Utilisateurs non-admin</h2>
+<table border="1" cellpadding="5">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Email</th>
+            <th>Adresse</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.name }}</td>
+                <td>{{ user.surname }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.adresse }}</td>
+                <td>
+                    <form method="post" action="{{ path('admin_delete_user', {'id': user.id}) }}" onsubmit="return confirm('Supprimer cet utilisateur ?');">
+                        <button type="submit">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="6">Aucun utilisateur non-admin</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2>Créer un nouvel admin</h2>
+<form method="post" action="{{ path('admin_create_admin') }}">
+    <input type="text" name="name" placeholder="Prénom" required>
+    <input type="text" name="surname" placeholder="Nom" required>
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="text" name="adresse" placeholder="Adresse" required>
+    <input type="password" name="password" placeholder="Mot de passe" required>
+    <button type="submit">Créer Admin</button>
+</form>
+
+{% endblock %}

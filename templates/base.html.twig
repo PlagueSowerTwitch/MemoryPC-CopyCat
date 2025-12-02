@@ -2,43 +2,40 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>{% block title %}Mon Site E-commerce{% endblock %}</title>
+    <title>{% block title %}MemoryPC Clone{% endblock %}</title>
 
-    {# CSS global #}
-    <link rel="stylesheet" href="{{ asset('build/app.css') }}">
-    
-    {# Bloc pour CSS spécifiques à certaines pages #}
+    {# CSS global et composants séparés #}
+    <link rel="stylesheet" href="{{ asset('css/Home.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/Header.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/Footer.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/cookie.css') }}">
     {% block stylesheets %}{% endblock %}
 </head>
 <body>
-    {# ===== HEADER / NAVBAR ===== #}
-    <header>
-        <nav class="navbar">
-            <ul>
-                <li><a href="{{ path('home') }}">Accueil</a></li>
-                <li><a href="{{ path('product_list') }}">Produits</a></li>
-                <li><a href="{{ path('cart') }}">Panier</a></li>
-                <li><a href="{{ path('account') }}">Compte</a></li>
-            </ul>
-        </nav>
-    </header>
 
-    {# ===== CONTENU PRINCIPAL ===== #}
+    {# HEADER #}
+    {% include 'components/header.html.twig' %}
+
+    {# CONTENU DE LA PAGE #}
     <main>
         {% block body %}{% endblock %}
     </main>
 
-    {# ===== FOOTER ===== #}
-    <footer>
-        <p>© 2025 Mon Site E-commerce. Tous droits réservés.</p>
-    </footer>
+    {# FOOTER #}
+    {% include 'components/footer.html.twig' %}
 
-    {# JS global #}
-    <script src="{{ asset('build/app.js') }}"></script>
+    {# POP-UP COOKIES #}
+    {% include 'components/cookie_pop-up.html.twig' %}
 
-    {# Bloc pour JS spécifiques à certaines pages #}
+    {# JS global et composants séparés, avec nonce pour CSP #}
+    <script src="{{ asset('js/app.js') }}" nonce="{{ csp_nonce('script') }}"></script>
+    <script src="{{ asset('js/cookie-pop-up.js') }}" nonce="{{ csp_nonce('script') }}"></script>
+
+    {# Exemple de script inline avec nonce #}
+    <script nonce="{{ csp_nonce('script') }}">
+        console.log('CSP OK');
+    </script>
+
     {% block javascripts %}{% endblock %}
 </body>
 </html>

@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion / Inscription{% endblock %}
+
+{% block body %}
+<div class="account-page">
+    <div class="account-container">
+
+        <!-- SECTION CONNEXION -->
+        <div class="login-section">
+            <h2>Connexion</h2>
+
+            {% if error %}
+                <div class="error">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
+
+            <form action="{{ path('account_login') }}" method="post">
+                <input type="text" name="_username" value="{{ last_username }}" placeholder="Adresse email" required>
+                <input type="password" name="_password" placeholder="Mot de passe" required>
+                <button type="submit">Se connecter</button>
+            </form>
+        </div>
+
+        <!-- SECTION INSCRIPTION -->
+        <div class="register-section">
+            <h2>Créer un compte</h2>
+
+            <!-- 🔥 Messages de succès -->
+            {% for message in app.flashes('success') %}
+                <div class="success">{{ message }}</div>
+            {% endfor %}
+
+            <!-- 🔥 Messages d'erreur -->
+            {% for message in app.flashes('error') %}
+                <div class="error">{{ message }}</div>
+            {% endfor %}
+
+            <form action="{{ path('account_register') }}" method="post" id="register-form">
+                <input type="text" name="name" placeholder="Prénom" required>
+                <input type="text" name="surname" placeholder="Nom" required>
+                <input type="email" name="email" placeholder="Adresse email" required>
+                <input type="text" name="adresse" placeholder="Adresse" required>
+                
+                <!-- Mot de passe -->
+                <input type="password" id="password" name="password" placeholder="Mot de passe" required>
+
+                <!-- Indicateurs de mot de passe -->
+                
+
+                <button type="submit">Créer un compte</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script defer src="{{ asset('build/password-check.js') }}"></script>
+{% endblock %}

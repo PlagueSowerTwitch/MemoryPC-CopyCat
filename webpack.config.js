@@ -21,6 +21,15 @@ Encore
      * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
      */
     .addEntry('app', './assets/js/app.js')
+    .addEntry('cookie_pop-up', './assets/js/cookie_pop-up.js')
+    .addStyleEntry('Header', './assets/styles/Header.css')
+    .addStyleEntry('Home', './assets/styles/Home.css')
+    .addStyleEntry('Footer', './assets/styles/Footer.css')
+    .addStyleEntry('Account', './assets/styles/Account.css')
+    .addStyleEntry('legal', './assets/styles/legal.css')
+
+
+
 
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
     .splitEntryChunks()

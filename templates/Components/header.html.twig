@@ -1,0 +1,48 @@
+<header class="main-header">
+    <div class="hero-banner">
+        <div class="container-hero">
+            <div class="bloc_hero"><img src="{{ asset('images/green_checkmark.jpg') }}" width="16" height="16" alt="green_checkmark">Systèmes PC Made in Germany</div>
+            <div class="bloc_hero"><img src="{{ asset('images/green_checkmark.jpg') }}" width="16" height="16" alt="green_checkmark">Échange préalable sans longs délais</div>
+            <div class="bloc_hero"><img src="{{ asset('images/green_checkmark.jpg') }}" width="16" height="16" alt="green_checkmark">Configurateur PC complet</div>
+            <div class="bloc_hero"><img src="{{ asset('images/green_checkmark.jpg') }}" width="16" height="16" alt="green_checkmark">Livraison sûre</div>
+            <div class="bloc_hero"><img src="{{ asset('images/green_checkmark.jpg') }}" width="16" height="16" alt="green_checkmark">Production d'énergie verte</div>
+        </div>
+    </div>
+
+    <div class="header-top">
+        <div class="search-bar">
+            <input type="text" placeholder="Rechercher un PC, composant, accessoire...">
+            <button>🔍</button>
+        </div>
+
+        <div class="logo">
+            <a href="{{ path('home') }}">
+                <img src="{{ asset('images/memorypc.jpg') }}" width="40%" alt="MemoryPC">
+            </a>
+        </div>
+
+        <div class="header-icons">
+            {% if app.user %}
+                <div class="account-dropdown">
+                    <span class="account-icon">👤</span>
+                    <div class="dropdown-menu">
+                        <a href="{{ path('account') }}">Mon compte</a>
+                        <a href="{{ path('account_logout') }}">Déconnexion</a>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{{ path('account_login') }}">👤</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <nav class="header-nav">
+        <ul>
+            <li><a href="#">PC Gamer</a></li>
+            <li><a href="#">PC Professionnels</a></li>
+            <li><a href="#">Composants</a></li>
+            <li><a href="#">Accessoires</a></li>
+            <li><a href="#">Promotions</a></li>
+        </ul>
+    </nav>
+</header>
