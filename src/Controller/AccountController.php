@@ -10,6 +10,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class AccountController extends AbstractController
 {
@@ -104,36 +106,41 @@ class AccountController extends AbstractController
     }
 
     #[Route('/account/update', name: 'account_update', methods: ['POST'])]
-    public function update(Request $request, EntityManagerInterface $em): Response
+    public function update(Request $request, EntityManagerInterface $em, CsrfTokenManagerInterface $csrfTokenManager): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        // Récupère l'utilisateur connecté
+        $currentUser = $this->getUser();
 
-        /** @var \App\Entity\User $user */
-        $user = $this->getUser();
+        if (!$currentUser instanceof User) {
+            $this->addFlash('error', 'Vous devez être connecté pour modifier votre compte.');
+            return $this->redirectToRoute('account_login');
+        }
 
-        $name = $request->request->get('name');
-        $surname = $request->request->get('surname');
-        $email = $request->request->get('email');
-        $adresse = $request->request->get('adresse');
-
-        // Vérifie si l’email est déjà utilisé par un autre utilisateur
-        $existingUser = $em->getRepository(User::class)->findOneBy(['email' => $email]);
-        if ($existingUser && $existingUser->getId() !== $user->getId()) {
-            $this->addFlash('error', 'Cet email est déjà utilisé par un autre compte.');
+        // Vérifie le token CSRF
+        $submittedToken = $request->request->get('_token');
+        if (!$csrfTokenManager->isTokenValid(new CsrfToken('account_update', $submittedToken))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
             return $this->redirectToRoute('account');
         }
 
-        $user->setName($name)
-            ->setSurname($surname)
-            ->setEmail($email)
-            ->setAdresse($adresse);
+        // Vérifie que l'ID envoyé correspond à l'utilisateur connecté
+        $userIdFromForm = (int) $request->request->get('user_id');
+        if ($currentUser->getId() !== $userIdFromForm) {
+            $this->addFlash('error', 'Vous ne pouvez pas modifier le compte d’un autre utilisateur.');
+            return $this->redirectToRoute('account');
+        }
 
-        $em->persist($user);
+        // Mise à jour des informations
+        $currentUser->setName($request->request->get('name'));
+        $currentUser->setSurname($request->request->get('surname'));
+        $currentUser->setEmail($request->request->get('email'));
+        $currentUser->setAdresse($request->request->get('adresse'));
+
+        $em->persist($currentUser);
         $em->flush();
 
-        $this->addFlash('success', 'Vos informations ont été mises à jour avec succès.');
+        $this->addFlash('success', 'Votre compte a été mis à jour avec succès.');
         return $this->redirectToRoute('account');
     }
-
 
 }

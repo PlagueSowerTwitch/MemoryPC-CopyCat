@@ -12,3 +12,11 @@
         </form>
     </div>
 </div>
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('build/cookie.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('build/cookie_pop-up.js') }}" nonce="{{ csp_nonce('script') }}"></script>
+{% endblock %}

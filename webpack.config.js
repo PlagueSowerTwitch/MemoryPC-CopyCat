@@ -27,6 +27,7 @@ Encore
     .addStyleEntry('Footer', './assets/styles/Footer.css')
     .addStyleEntry('Account', './assets/styles/Account.css')
     .addStyleEntry('legal', './assets/styles/legal.css')
+    .addStyleEntry('cookie', './assets/styles/Cookie.css')
 
 
 

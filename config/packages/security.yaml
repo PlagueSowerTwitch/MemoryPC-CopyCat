@@ -37,4 +37,11 @@ security:
                 always_remember_me: false
 
     access_control:
+        - { path: ^/home$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/legal_mention$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/checkout$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/cart$, roles: ROLE_USER }
         - { path: ^/account$, roles: ROLE_USER }
+        - { path: ^/admin$, roles: ROLE_ADMIN }
+

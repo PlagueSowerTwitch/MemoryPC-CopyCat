@@ -8,29 +8,53 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Si déjà accepté -> rien afficher
-    if (localStorage.getItem('cookieConsent') === 'true') {
+    // ------------------------
+    // Fonction pour afficher/masquer popup
+    // ------------------------
+    const showPopup = () => {
+        popup.removeAttribute('aria-hidden');
+        overlay.removeAttribute('aria-hidden');
+        // Pour l'accessibilité, focus sur le checkbox
+        checkbox.focus();
+    };
+
+    const hidePopup = () => {
         popup.setAttribute('aria-hidden', 'true');
         overlay.setAttribute('aria-hidden', 'true');
-        return;
+    };
+
+    // ------------------------
+    // Gestion du consentement
+    // ------------------------
+    const consentKey = 'cookieConsent';
+
+    // Vérifie si serveur a forcé le reset (via un attribut data-reset sur body)
+    const forceReset = document.body.dataset.cookieReset === 'true';
+
+    if (forceReset) {
+        localStorage.removeItem(consentKey);
     }
 
-    // Affiche popup + overlay
-    popup.setAttribute('aria-hidden', 'false');
-    overlay.setAttribute('aria-hidden', 'false');
+    // Affiche popup si pas encore accepté
+    if (localStorage.getItem(consentKey) !== 'true') {
+        showPopup();
+    } else {
+        hidePopup();
+    }
 
+    // ------------------------
+    // Événement submit
+    // ------------------------
     form.addEventListener('submit', (e) => {
         e.preventDefault();
 
         if (!checkbox.checked) {
             alert('Vous devez accepter les cookies pour continuer.');
+            checkbox.focus();
             return;
         }
 
-        localStorage.setItem('cookieConsent', 'true');
-
-        // Masque les deux
-        popup.setAttribute('aria-hidden', 'true');
-        overlay.setAttribute('aria-hidden', 'true');
+        localStorage.setItem(consentKey, 'true');
+        hidePopup();
     });
 });

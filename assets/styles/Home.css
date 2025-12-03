@@ -1,0 +1,40 @@
+/* --- Styles globaux pour la homepage et les sections --- */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f7f7f7;
+    color: #333;
+}
+
+.hero-banner img {
+    width: 100%;
+    display: block;
+}
+
+.category-section {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.category-section h2 {
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+.product-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.product-card {
+    flex: 1 1 calc(33.333% - 20px);
+    background: #fff;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.05);
+    text-align: center;
+}

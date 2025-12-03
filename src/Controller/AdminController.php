@@ -16,7 +16,14 @@ class AdminController extends AbstractController
     #[Route('/', name: 'admin_dashboard')]
     public function index(EntityManagerInterface $em): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        if (!$this->getUser()) {
+            return $this->redirectToRoute('account_login');
+        }
+
+        // Si connecté mais pas admin → redirection vers home
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('home');
+        }
 
         // Récupère tous les utilisateurs non-admin
         $users = $em->getRepository(User::class)->findBy(['isAdmin' => false]);
@@ -29,7 +36,14 @@ class AdminController extends AbstractController
     #[Route('/delete/{id}', name: 'admin_delete_user', methods: ['POST'])]
     public function delete(User $user, EntityManagerInterface $em): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        if (!$this->getUser()) {
+            return $this->redirectToRoute('account_login');
+        }
+
+        // Si connecté mais pas admin → redirection vers home
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('home');
+        }
 
         if ($user->isAdmin()) {
             $this->addFlash('error', 'Impossible de supprimer un autre admin.');

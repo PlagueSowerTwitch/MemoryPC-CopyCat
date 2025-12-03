@@ -4,38 +4,33 @@
     <meta charset="UTF-8">
     <title>{% block title %}MemoryPC Clone{% endblock %}</title>
 
-    {# CSS global et composants séparés #}
-    <link rel="stylesheet" href="{{ asset('css/Home.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/Header.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/Footer.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/cookie.css') }}">
-    {% block stylesheets %}{% endblock %}
+    {# CSS externes #}
+    <link rel="stylesheet" href="{{ asset('build/Home.css') }}">
+    <link rel="stylesheet" href="{{ asset('build/Header.css') }}">
+    <link rel="stylesheet" href="{{ asset('build/Footer.css') }}">
+    <link rel="stylesheet" href="{{ asset('build/Account.css') }}">
+    <link rel="stylesheet" href="{{ asset('build/Legal.css') }}">
+    
+    {# CSP Security Headers via Nelmio #}
 </head>
 <body>
 
-    {# HEADER #}
+    {# HEADER COMMUN #}
     {% include 'components/header.html.twig' %}
 
-    {# CONTENU DE LA PAGE #}
+    {# CONTENU PRINCIPAL #}
     <main>
         {% block body %}{% endblock %}
     </main>
 
-    {# FOOTER #}
+    {# FOOTER COMMUN #}
     {% include 'components/footer.html.twig' %}
 
-    {# POP-UP COOKIES #}
+    {# POPUP COOKIES #}
     {% include 'components/cookie_pop-up.html.twig' %}
 
-    {# JS global et composants séparés, avec nonce pour CSP #}
-    <script src="{{ asset('js/app.js') }}" nonce="{{ csp_nonce('script') }}"></script>
-    <script src="{{ asset('js/cookie-pop-up.js') }}" nonce="{{ csp_nonce('script') }}"></script>
+    {# Scripts externes #}
+    {{ encore_entry_script_tags('app') }}
 
-    {# Exemple de script inline avec nonce #}
-    <script nonce="{{ csp_nonce('script') }}">
-        console.log('CSP OK');
-    </script>
-
-    {% block javascripts %}{% endblock %}
 </body>
 </html>
