@@ -11,15 +11,16 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      mysql:
-        image: mysql:8.0
+      postgres:
+        image: postgres:16
         env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: 0123456789
+          POSTGRES_DB: MemoryPC_test
         ports:
-          - 3306:3306
+          - 5432:5432
         options: >-
-          --health-cmd "mysqladmin ping --silent"
+          --health-cmd "pg_isready -U postgres"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -27,7 +28,7 @@ jobs:
     env:
       APP_ENV: test
       APP_DEBUG: 1
-      DATABASE_URL: "mysql://root:root@127.0.0.1:3306/test"
+      DATABASE_URL: "pgsql://postgres:0123456789@127.0.0.1:5432/MemoryPC_test?serverVersion=16&charset=utf8"
       DEFAULT_URI: "http://localhost:8000"
 
     steps:
@@ -41,7 +42,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.4
-          extensions: mbstring, intl, pdo_mysql
+          extensions: mbstring, intl, pdo_pgsql
 
       - name: Install Composer dependencies (without scripts)
         run: composer install --no-interaction --no-progress --no-scripts
@@ -62,6 +63,14 @@ jobs:
 
       - name: Run NPM Audit
         run: npm audit --audit-level=high
+
+      # ------------------------------
+      # Prepare PostgreSQL test database
+      # ------------------------------
+      - name: Create test database
+        run: |
+          PGPASSWORD=0123456789 psql -h 127.0.0.1 -U postgres -tc "SELECT 1 FROM pg_database WHERE datname = 'MemoryPC_test'" | grep -q 1 || \
+          PGPASSWORD=0123456789 psql -h 127.0.0.1 -U postgres -c "CREATE DATABASE MemoryPC_test"
 
       # ------------------------------
       # Symfony & PHPUnit tests
