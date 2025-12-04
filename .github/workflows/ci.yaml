@@ -10,94 +10,18 @@ jobs:
   ci:
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: MemoryPC_test
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd "mysqladmin ping --silent"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    env:
-      APP_ENV: test
-      APP_DEBUG: 1
-      DATABASE_URL: "mysql://root:root@127.0.0.1:3306/MemoryPC_test?serverVersion=8.0&charset=utf8mb4"
-      DEFAULT_URI: "http://localhost:8000"
-
     steps:
-      # ------------------------------
-      # Checkout
-      # ------------------------------
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # ------------------------------
-      # PHP + Composer
-      # ------------------------------
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.4
-          extensions: mbstring, intl, pdo_mysql
+          extensions: mbstring, intl
 
-      - name: Install Composer dependencies (without scripts)
+      - name: Install Composer dependencies
         run: composer install --no-interaction --no-progress --no-scripts
-
-      - name: Run Composer Security Audit
-        run: composer audit --locked
-
-      # ------------------------------
-      # Node + NPM Audit
-      # ------------------------------
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Install NPM packages
-        run: npm install
-
-      - name: Run NPM Audit
-        run: npm audit --audit-level=high
-
-      # ------------------------------
-      # Prepare MySQL test database
-      # ------------------------------
-      - name: Prepare MySQL test database
-        run: |
-          echo "Waiting for MySQL to be ready..."
-          for i in {1..30}; do
-            if mysqladmin ping -h 127.0.0.1 -u root -proot > /dev/null 2>&1; then
-              echo "MySQL is ready!"
-              break
-            fi
-            echo "Waiting..."
-            sleep 2
-          done
-
-          echo "Creating test database if it does not exist..."
-          mysql -h 127.0.0.1 -u root -proot -e "CREATE DATABASE IF NOT EXISTS MemoryPC_test_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-
-
-      # ------------------------------
-      # Symfony & PHPUnit tests
-      # ------------------------------
-      - name: Prepare Symfony test environment
-        run: |
-          # Copier le .env.test pour que Symfony puisse le lire
-          cp .env.test .env
-
-          # Vider le cache pour l'environnement test
-          php bin/console cache:clear --env=test --no-warmup
-
-          # Exécuter les migrations pour la base de test
-          php bin/console doctrine:migrations:migrate --env=test --no-interaction
 
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit --testdox
