@@ -1,4 +1,4 @@
-name: CI
+name: Dependency Scan
 
 on:
   push:
@@ -7,13 +7,19 @@ on:
     branches: [ main ]
 
 jobs:
-  ci:
+  scan:
     runs-on: ubuntu-latest
 
     steps:
+      # ------------------------------
+      # Checkout repository
+      # ------------------------------
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # ------------------------------
+      # PHP + Composer Audit
+      # ------------------------------
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -21,7 +27,21 @@ jobs:
           extensions: mbstring, intl
 
       - name: Install Composer dependencies
-        run: composer install --no-interaction --no-progress --no-scripts
+        run: composer install --no-interaction --no-progress --prefer-dist
 
-      - name: Run PHPUnit tests
-        run: php bin/phpunit tests/Security/SecurityTest.php --testdox
+      - name: Composer Security Audit
+        run: composer audit --locked
+
+      # ------------------------------
+      # Node + NPM Audit
+      # ------------------------------
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install NPM packages
+        run: npm install
+
+      - name: NPM Audit
+        run: npm audit --audit-level=high
