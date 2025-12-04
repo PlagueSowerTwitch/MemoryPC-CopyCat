@@ -24,12 +24,17 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
+    env:
+      APP_ENV: test
+      APP_DEBUG: 1
+      DATABASE_URL: "mysql://root:root@127.0.0.1:3306/test"
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       # ------------------------------
-      # PHP + Composer Audit
+      # PHP + Composer
       # ------------------------------
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -37,14 +42,14 @@ jobs:
           php-version: 8.4
           extensions: mbstring, intl, pdo_mysql
 
-      - name: Install Composer dependencies
-        run: composer install --no-interaction --no-progress
+      - name: Install Composer dependencies (without scripts)
+        run: composer install --no-interaction --no-progress --no-scripts
 
-      - name: Composer Security Audit
+      - name: Run Composer Security Audit
         run: composer audit --locked
 
       # ------------------------------
-      # JS + NPM Audit
+      # Node + NPM Audit
       # ------------------------------
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -54,16 +59,22 @@ jobs:
       - name: Install NPM packages
         run: npm install
 
-      - name: NPM Audit
+      - name: Run NPM Audit
         run: npm audit --audit-level=high
 
       # ------------------------------
-      # PHPUnit + tests anti-XSS
+      # Symfony & PHPUnit tests
       # ------------------------------
-      - name: Prepare symfony test env
+      - name: Prepare Symfony test environment
         run: |
+          # Copier le .env.test pour que Symfony puisse le lire
           cp .env.test .env
+
+          # Vider le cache pour l'environnement test
+          php bin/console cache:clear --env=test --no-warmup
+
+          # Exécuter les migrations pour la base de test
           php bin/console doctrine:migrations:migrate --env=test --no-interaction
 
-      - name: Run PHPUnit
+      - name: Run PHPUnit tests
         run: vendor/bin/phpunit --testdox
