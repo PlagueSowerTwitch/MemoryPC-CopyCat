@@ -10,6 +10,7 @@
         <ini name="error_reporting" value="-1"/>
         <server name="APP_ENV" value="test" force="true"/>
         <server name="APP_DEBUG" value="1" force="true"/>
+        <env name="DATABASE_URL" value="sqlite:///%kernel.project_dir%/var/data_test.db"/>
         <server name="SHELL_VERBOSITY" value="-1"/>
     </php>
 
@@ -18,4 +19,5 @@
             <directory>tests</directory>
         </testsuite>
     </testsuites>
+
 </phpunit>

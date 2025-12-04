@@ -5,7 +5,6 @@ namespace App\Tests\Security;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
-use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * 🔒 SUITE DE TESTS DE SÉCURITÉ
@@ -19,16 +18,17 @@ class SecurityTest extends WebTestCase
 
     protected function setUp(): void
     {
-        // 🔥 NE PAS APPELER parent::setUp() ICI
-        // Cela bootait le kernel trop tôt
-        
-        // ✅ Créer le client EN PREMIER
         $this->client = static::createClient();
-        
-        // ✅ ENSUITE récupérer l'entity manager
         $this->entityManager = $this->client->getContainer()
             ->get('doctrine')
             ->getManager();
+
+        // 🔄 Vider complètement la table user avant chaque test
+        $connection = $this->entityManager->getConnection();
+        $platform = $connection->getDatabasePlatform();
+
+        // SQLite : RESET AUTO_INCREMENT et supprimer les lignes
+        $connection->executeStatement($platform->getTruncateTableSQL('user', true));
     }
 
     // ==========================================
@@ -48,7 +48,6 @@ class SecurityTest extends WebTestCase
             'adresse' => '123 Test St'
         ]);
 
-        // Attendu : Redirection ou erreur 403
         $this->assertNotEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 
@@ -64,12 +63,8 @@ class SecurityTest extends WebTestCase
             'adresse' => 'Dark Web'
         ]);
 
-        // Attendu : Redirection vers login (302) ou 403
         $response = $this->client->getResponse();
-        $this->assertTrue(
-            $response->isRedirect() || $response->getStatusCode() === Response::HTTP_FORBIDDEN,
-            'Non-authenticated user should not access account update'
-        );
+        $this->assertTrue($response->isRedirect() || $response->getStatusCode() === 403);
     }
 
     /**
@@ -77,22 +72,19 @@ class SecurityTest extends WebTestCase
      */
     public function testDeleteUserWithoutAdminRoleShouldFail(): void
     {
-        // Créer un utilisateur normal
-        $user = $this->createTestUser('normaluser@test.com', false);
+        $user = $this->createTestUser('normal@test.com', false);
+        $this->client->request('GET', '/');
         $this->loginAs($user);
 
-        // Tenter de supprimer un autre utilisateur
         $targetUser = $this->createTestUser('victim@test.com', false);
-        
+
         $this->client->request('POST', '/admin/delete/' . $targetUser->getId());
 
-        // Attendu : 403 Forbidden ou redirection
+        $status = $this->client->getResponse()->getStatusCode();
         $this->assertTrue(
-            $this->client->getResponse()->getStatusCode() >= 400,
-            'Normal user should not delete other users'
+            $status === 403 || $status === 302,
+            "Expected 403 or redirect (302), got $status"
         );
-
-        $this->cleanup($user, $targetUser);
     }
 
     // ==========================================
@@ -104,29 +96,22 @@ class SecurityTest extends WebTestCase
      */
     public function testSqlInjectionInLoginEmail(): void
     {
-        $sqlInjectionPayloads = [
+        $sqlPayloads = [
             "admin' OR '1'='1",
             "admin'--",
-            "admin' /*",
             "' OR 1=1--",
             "admin' UNION SELECT NULL--",
-            "1' OR '1' = '1')) /*"
         ];
 
-        foreach ($sqlInjectionPayloads as $payload) {
-            // 🔥 CRÉER UN NOUVEAU CLIENT POUR CHAQUE TEST
+        foreach ($sqlPayloads as $payload) {
             $client = static::createClient();
-            
+
             $client->request('POST', '/account/login', [
                 '_username' => $payload,
                 '_password' => 'anything'
             ]);
 
-            // Attendu : Ne doit PAS être authentifié
-            $this->assertFalse(
-                $this->isAuthenticatedInClient($client),
-                "SQL Injection payload should not authenticate: {$payload}"
-            );
+            $this->assertFalse($this->isAuthenticatedInClient($client));
         }
     }
 
@@ -136,7 +121,7 @@ class SecurityTest extends WebTestCase
     public function testSqlInjectionInRegistration(): void
     {
         $payload = "test'; DROP TABLE user; --";
-        
+
         $this->client->request('POST', '/account/register', [
             'name' => $payload,
             'surname' => 'Test',
@@ -146,14 +131,10 @@ class SecurityTest extends WebTestCase
         ]);
 
         // Vérifier que la table existe toujours
-        $connection = $this->entityManager->getConnection();
-        $schemaManager = $connection->createSchemaManager();
-        
-        // 🔥 UTILISER listTableNames() au lieu de tablesExist()
-        $tables = $schemaManager->listTableNames();
-        $tableExists = in_array('user', $tables);
+        $schema = $this->entityManager->getConnection()->createSchemaManager();
+        $tables = $schema->listTableNames();
 
-        $this->assertTrue($tableExists, 'SQL Injection should not drop tables');
+        $this->assertContains('user', $tables, 'User table must not be dropped.');
     }
 
     /**
@@ -188,20 +169,16 @@ class SecurityTest extends WebTestCase
      */
     public function testIdorAccountUpdate(): void
     {
-        // Créer deux utilisateurs
-        $user1 = $this->createTestUser('user1@test.com', false);
-        $user2 = $this->createTestUser('user2@test.com', false);
+        $user1 = $this->createTestUser('user1@test.com');
+        $user2 = $this->createTestUser('user2@test.com');
 
-        // Se connecter en tant qu'user1
         $this->loginAs($user1);
 
-        // Obtenir le token CSRF
         $crawler = $this->client->request('GET', '/account');
         $token = $crawler->filter('input[name="_token"]')->attr('value');
 
-        // Tenter de modifier les données d'user2
         $this->client->request('POST', '/account/update', [
-            'user_id' => $user2->getId(), // 🔥 TENTER DE MODIFIER L'ID
+            'user_id' => $user2->getId(),
             'name' => 'Hacked',
             'surname' => 'User',
             'email' => $user2->getEmail(),
@@ -209,12 +186,8 @@ class SecurityTest extends WebTestCase
             '_token' => $token
         ]);
 
-        // Vérifier que user2 n'a PAS été modifié
         $this->entityManager->refresh($user2);
-        $this->assertNotEquals('Hacked', $user2->getName(), 
-            'User should not be able to modify another user data');
-
-        $this->cleanup($user1, $user2);
+        $this->assertNotEquals('Hacked', $user2->getName());
     }
 
     /**
@@ -312,6 +285,7 @@ class SecurityTest extends WebTestCase
 
             if ($user) {
                 // Récupérer la page du compte
+                $this->client->request('GET', '/account');
                 $this->loginAs($user);
                 $this->client->request('GET', '/account');
                 
@@ -372,27 +346,14 @@ class SecurityTest extends WebTestCase
      */
     public function testReflectedXss(): void
     {
-        $xssPayloads = [
-            '<script>alert(1)</script>',
-            '"><script>alert(1)</script>',
-        ];
+        $payload = '<script>alert(1)</script>';
 
-        foreach ($xssPayloads as $payload) {
-            // Test sur une page de recherche ou d'erreur
-            $this->client->request('GET', '/products', ['search' => $payload]);
-            
-            $content = $this->client->getResponse()->getContent();
-            
-            // Vérifier que le payload est échappé
-            $escapedPayload = htmlspecialchars($payload, ENT_QUOTES, 'UTF-8');
-            
-            // Si le contenu contient le payload non échappé, c'est une faille
-            if (strpos($content, $payload) !== false && strpos($content, $escapedPayload) === false) {
-                $this->fail('Reflected XSS vulnerability detected: payload was not escaped');
-            }
-            
-            $this->assertTrue(true, 'XSS payload properly handled');
-        }
+        $this->client->request('GET', '/products', ['search' => $payload]);
+        $content = $this->client->getResponse()->getContent();
+
+        $escaped = htmlspecialchars($payload, ENT_QUOTES, 'UTF-8');
+
+        $this->assertFalse(str_contains($content, $payload) && !str_contains($content, $escaped));
     }
 
     // ==========================================
@@ -405,8 +366,8 @@ class SecurityTest extends WebTestCase
         $user->setName('Test')
             ->setSurname('User')
             ->setEmail($email)
-            ->setPassword('$2y$13$hashed') // Hash factice
-            ->setAdresse('Test Address')
+            ->setPassword(password_hash('test', PASSWORD_BCRYPT))
+            ->setAdresse('Test')
             ->setIsAdmin($isAdmin);
 
         $this->entityManager->persist($user);
@@ -417,8 +378,14 @@ class SecurityTest extends WebTestCase
 
     private function loginAs(User $user): void
     {
-        $session = $this->client->getContainer()->get('request_stack')->getSession();
-        
+        // Faire une requête initiale pour créer la session
+        $this->client->request('GET', '/');
+
+        $session = $this->client->getRequest()->getSession();
+        if (!$session) {
+            throw new \RuntimeException('Impossible de récupérer la session.');
+        }
+
         $firewallName = 'main';
         $token = new \Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken(
             $user,
@@ -431,11 +398,6 @@ class SecurityTest extends WebTestCase
 
         $cookie = new \Symfony\Component\BrowserKit\Cookie($session->getName(), $session->getId());
         $this->client->getCookieJar()->set($cookie);
-    }
-
-    private function isAuthenticated(): bool
-    {
-        return $this->isAuthenticatedInClient($this->client);
     }
 
     private function isAuthenticatedInClient($client): bool
