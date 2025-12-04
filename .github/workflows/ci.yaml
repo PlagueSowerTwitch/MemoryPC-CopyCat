@@ -32,6 +32,9 @@ jobs:
       DEFAULT_URI: "http://localhost:8000"
 
     steps:
+      # ------------------------------
+      # Checkout
+      # ------------------------------
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -51,7 +54,7 @@ jobs:
         run: composer audit --locked
 
       # ------------------------------
-      # Node + NPM Audit
+      # Node + NPM
       # ------------------------------
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -82,7 +85,6 @@ jobs:
           echo "Creating test database if it does not exist..."
           PGPASSWORD=0123456789 psql -h postgres -U postgres -tc "SELECT 1 FROM pg_database WHERE datname = 'MemoryPC_test'" | grep -q 1 || \
           PGPASSWORD=0123456789 psql -h postgres -U postgres -c "CREATE DATABASE MemoryPC_test"
-
 
       # ------------------------------
       # Symfony & PHPUnit tests
