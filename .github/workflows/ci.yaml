@@ -11,14 +11,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ------------------------------
-      # Checkout repository
-      # ------------------------------
       - name: Checkout code
         uses: actions/checkout@v4
 
       # ------------------------------
-      # PHP + Composer Audit
+      # PHP + Composer
       # ------------------------------
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -26,8 +23,8 @@ jobs:
           php-version: 8.4
           extensions: mbstring, intl
 
-      - name: Install Composer dependencies
-        run: composer install --no-interaction --no-progress --prefer-dist
+      - name: Install Composer dependencies (no scripts)
+        run: composer install --no-interaction --no-progress --no-scripts
 
       - name: Composer Security Audit
         run: composer audit --locked
