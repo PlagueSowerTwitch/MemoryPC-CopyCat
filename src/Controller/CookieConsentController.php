@@ -39,7 +39,7 @@ class CookieConsentController extends AbstractController
 
         $cookie = Cookie::create('cookie_preferences')
             ->withValue(json_encode($preferences))
-            ->withExpires(strtotime('+6 months'))
+            ->withExpires(strtotime('+30 minutes'))
             ->withHttpOnly(true)
             ->withSecure(true)
             ->withSameSite('Strict')
@@ -89,7 +89,7 @@ class CookieConsentController extends AbstractController
         $cookie = Cookie::create(
             'cookie_consent',
             '',
-            time() - 3600,
+            time() - 1800, 
             '/',
             null,
             true,
