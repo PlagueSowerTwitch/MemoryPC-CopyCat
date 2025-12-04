@@ -18,10 +18,10 @@ jobs:
       # PHP + Composer
       # ------------------------------
       - name: Setup PHP
-        uses: f95f554cc7c9bb6474f307fcfe6cc3f00b2c7a45
+        uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.4
-          extensions: mbstring, intl
+          php-version: '8.4'
+          extensions: intl-77.1
 
       - name: Install Composer dependencies (no scripts)
         run: composer install --no-interaction --no-progress --no-scripts
