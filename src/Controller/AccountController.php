@@ -1,8 +1,9 @@
-<?php 
+<?php
 
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Service\CookiePreferencesService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -61,12 +62,10 @@ class AccountController extends AbstractController
             $errors[] = "Le mot de passe doit contenir au moins 1 chiffre.";
         }
 
-        // Caractères spéciaux → version 100% sûre
         if (!preg_match('/[!@#$%^&*()_\-+={}[\]|\\:;"\'<>,.?~`]/', $password)) {
             $errors[] = "Le mot de passe doit contenir au moins 1 caractère spécial.";
         }
 
-        // Si des erreurs → renvoyer
         if (!empty($errors)) {
             foreach ($errors as $err) {
                 $this->addFlash('error', $err);
@@ -84,7 +83,6 @@ class AccountController extends AbstractController
                  $hasher->hashPassword($user, $password)
              );
 
-        // Sauvegarde
         $em->persist($user);
         $em->flush();
 
@@ -93,10 +91,13 @@ class AccountController extends AbstractController
     }
 
     #[Route('/account', name: 'account')]
-    public function account(): Response
+    public function account(CookiePreferencesService $cookiePrefs): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        return $this->render('account/index.html.twig');
+
+        return $this->render('account/index.html.twig', [
+            'cookiePrefs' => $cookiePrefs->getPreferences(),
+        ]);
     }
 
     #[Route('/account/logout', name: 'account_logout')]
@@ -142,5 +143,4 @@ class AccountController extends AbstractController
         $this->addFlash('success', 'Votre compte a été mis à jour avec succès.');
         return $this->redirectToRoute('account');
     }
-
 }

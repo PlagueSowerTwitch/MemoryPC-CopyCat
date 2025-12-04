@@ -22,6 +22,7 @@ Encore
      */
     .addEntry('app', './assets/js/app.js')
     .addEntry('cookie_pop-up', './assets/js/cookie_pop-up.js')
+    .addEntry('cookie_settings', './assets/js/cookie_settings.js')
     .addStyleEntry('Header', './assets/styles/Header.css')
     .addStyleEntry('Home', './assets/styles/Home.css')
     .addStyleEntry('Footer', './assets/styles/Footer.css')

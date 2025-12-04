@@ -1,20 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+<phpunit bootstrap="tests/bootstrap.php"
          colors="true"
-         bootstrap="tests/bootstrap.php"
-         cacheDirectory=".phpunit.cache"
-         verbose="true"
          failOnDeprecation="true"
          failOnNotice="true"
-         failOnWarning="true"
->
+         failOnWarning="true">
+
     <php>
-        <!-- Affichage des erreurs pour debug -->
         <ini name="display_errors" value="1"/>
         <ini name="error_reporting" value="-1"/>
-        <!-- Force l'environnement test -->
         <server name="APP_ENV" value="test" force="true"/>
         <server name="APP_DEBUG" value="1" force="true"/>
         <server name="SHELL_VERBOSITY" value="-1"/>
@@ -25,18 +18,4 @@
             <directory>tests</directory>
         </testsuite>
     </testsuites>
-
-    <coverage processUncoveredFiles="true">
-        <include>
-            <directory>src</directory>
-        </include>
-        <exclude>
-            <directory>src/Migrations</directory>
-            <directory>src/Kernel.php</directory>
-        </exclude>
-    </coverage>
-
-    <listeners>
-        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" file="vendor/symfony/phpunit-bridge/SymfonyTestsListener.php"/>
-    </listeners>
 </phpunit>

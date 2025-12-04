@@ -3,20 +3,23 @@
 <div id="cookie-popup" class="cookie-popup" aria-hidden="true">
     <div class="cookie-popup-content">
         <p>Nous utilisons des cookies pour améliorer votre expérience.</p>
+
         <form id="cookie-form">
             <label>
-                <input type="checkbox" id="cookie-consent" required>
-                J'accepte que mes données soient utilisées
+                <input type="checkbox" id="cookie-necessary" required>
+                Cookies nécessaires (obligatoires)
             </label>
-            <button type="submit">Valider</button>
+            <label>
+                <input type="checkbox" id="cookie-analytics">
+                Cookies analytiques (optionnels)
+            </label>
+
+            <div class="cookie-buttons">
+                <button type="submit">Valider mes choix</button>
+                <button type="button" id="reset-cookies">Réinitialiser mes choix</button>
+            </div>
         </form>
+
+        <div id="cookie-status" class="cookie-status"></div>
     </div>
 </div>
-
-{% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('build/cookie.css') }}">
-{% endblock %}
-
-{% block javascripts %}
-    <script src="{{ asset('build/cookie_pop-up.js') }}" nonce="{{ csp_nonce('script') }}"></script>
-{% endblock %}

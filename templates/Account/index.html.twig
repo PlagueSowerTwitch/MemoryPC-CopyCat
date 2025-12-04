@@ -8,10 +8,10 @@
 
         <h1>Mon compte</h1>
 
-        {# Affichage des messages flash #}
         {% for message in app.flashes('success') %}
             <div class="flash-success">{{ message }}</div>
         {% endfor %}
+        
         {% for message in app.flashes('error') %}
             <div class="flash-error">{{ message }}</div>
         {% endfor %}
@@ -37,7 +37,6 @@
         </form>
         </div>
 
-        {# Si l'utilisateur est admin, afficher le bouton Admin #}
         {% if 'ROLE_ADMIN' in app.user.roles %}
             <div class="admin-button">
                 <a href="{{ path('admin_dashboard') }}">
@@ -46,6 +45,27 @@
             </div>
         {% endif %}
 
-    </div>
-</div>
+        <hr>
+
+        <h2>Gestion des cookies</h2>
+
+{% set prefs = cookiePrefs ?? { necessary: false, analytics: false } %}
+
+<form id="cookie-settings-form">
+    <label>
+        <input type="checkbox" name="necessary" {% if prefs.necessary %}checked{% endif %} required>
+        Cookies nécessaires (obligatoires pour naviguer)
+    </label>
+
+    <label>
+        <input type="checkbox" name="analytics" {% if prefs.analytics %}checked{% endif %}>
+        Cookies d'analyse (optionnels)
+    </label>
+
+    <button type="submit">Enregistrer mes préférences</button>
+    <button type="button" id="reset-cookies">Réinitialiser mes choix</button>
+</form>
+
+<div id="cookie-status"></div>
+
 {% endblock %}

@@ -5,5 +5,7 @@
  * which should already be in your base.html.twig.
  */
 import '../styles/app.css';
+import './cookie_pop-up.js';
+import './cookie_settings.js';
 
 console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
