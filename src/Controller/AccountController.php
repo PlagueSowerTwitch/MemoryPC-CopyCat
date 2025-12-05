@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Service\CookiePreferencesService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,9 +28,17 @@ class AccountController extends AbstractController
     public function register(
         Request $request,
         UserPasswordHasherInterface $hasher,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        CsrfTokenManagerInterface $csrfTokenManager // ✅ AJOUT
     ): Response
     {
+        // ✅ VALIDATION DU TOKEN CSRF
+        $submittedToken = $request->request->get('_token');
+        if (!$csrfTokenManager->isTokenValid(new CsrfToken('register', $submittedToken))) {
+            $this->addFlash('error', 'Token de sécurité invalide. Veuillez réessayer.');
+            return $this->redirectToRoute('account_login');
+        }
+
         // Récupération des champs
         $name     = $request->request->get('name');
         $surname  = $request->request->get('surname');
@@ -61,7 +68,6 @@ class AccountController extends AbstractController
         if (!preg_match('/\d/', $password)) {
             $errors[] = "Le mot de passe doit contenir au moins 1 chiffre.";
         }
-
         if (!preg_match('/[!@#$%^&*()_\-+={}[\]|\\:;"\'<>,.?~`]/', $password)) {
             $errors[] = "Le mot de passe doit contenir au moins 1 caractère spécial.";
         }
@@ -91,13 +97,10 @@ class AccountController extends AbstractController
     }
 
     #[Route('/account', name: 'account')]
-    public function account(CookiePreferencesService $cookiePrefs): Response
+    public function account(): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
-        return $this->render('account/index.html.twig', [
-            'cookiePrefs' => $cookiePrefs->getPreferences(),
-        ]);
+        return $this->render('account/index.html.twig');
     }
 
     #[Route('/account/logout', name: 'account_logout')]
@@ -107,9 +110,12 @@ class AccountController extends AbstractController
     }
 
     #[Route('/account/update', name: 'account_update', methods: ['POST'])]
-    public function update(Request $request, EntityManagerInterface $em, CsrfTokenManagerInterface $csrfTokenManager): Response
+    public function update(
+        Request $request, 
+        EntityManagerInterface $em, 
+        CsrfTokenManagerInterface $csrfTokenManager
+    ): Response
     {
-        // Récupère l'utilisateur connecté
         $currentUser = $this->getUser();
 
         if (!$currentUser instanceof User) {
@@ -117,17 +123,17 @@ class AccountController extends AbstractController
             return $this->redirectToRoute('account_login');
         }
 
-        // Vérifie le token CSRF
+        // ✅ Vérifie le token CSRF
         $submittedToken = $request->request->get('_token');
         if (!$csrfTokenManager->isTokenValid(new CsrfToken('account_update', $submittedToken))) {
             $this->addFlash('error', 'Token CSRF invalide.');
             return $this->redirectToRoute('account');
         }
 
-        // Vérifie que l'ID envoyé correspond à l'utilisateur connecté
+        // ✅ Vérifie IDOR
         $userIdFromForm = (int) $request->request->get('user_id');
         if ($currentUser->getId() !== $userIdFromForm) {
-            $this->addFlash('error', 'Vous ne pouvez pas modifier le compte d’un autre utilisateur.');
+            $this->addFlash('error', 'Vous ne pouvez pas modifier le compte d\'un autre utilisateur.');
             return $this->redirectToRoute('account');
         }
 
