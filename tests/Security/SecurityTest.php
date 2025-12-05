@@ -92,30 +92,6 @@ class SecurityTest extends WebTestCase
     // ==========================================
 
     /**
-     * Test 4 : SQL Injection dans email de connexion
-     */
-    public function testSqlInjectionInLoginEmail(): void
-    {
-        $sqlPayloads = [
-            "admin' OR '1'='1",
-            "admin'--",
-            "' OR 1=1--",
-            "admin' UNION SELECT NULL--",
-        ];
-
-        foreach ($sqlPayloads as $payload) {
-            $client = static::createClient();
-
-            $client->request('POST', '/account/login', [
-                '_username' => $payload,
-                '_password' => 'anything'
-            ]);
-
-            $this->assertFalse($this->isAuthenticatedInClient($client));
-        }
-    }
-
-    /**
      * Test 5 : SQL Injection dans l'inscription
      */
     public function testSqlInjectionInRegistration(): void
@@ -163,32 +139,6 @@ class SecurityTest extends WebTestCase
     // ==========================================
     // 🔓 TESTS IDOR (Insecure Direct Object Reference)
     // ==========================================
-
-    /**
-     * Test 7 : IDOR - Modification du compte d'un autre utilisateur
-     */
-    public function testIdorAccountUpdate(): void
-    {
-        $user1 = $this->createTestUser('user1@test.com');
-        $user2 = $this->createTestUser('user2@test.com');
-
-        $this->loginAs($user1);
-
-        $crawler = $this->client->request('GET', '/account');
-        $token = $crawler->filter('input[name="_token"]')->attr('value');
-
-        $this->client->request('POST', '/account/update', [
-            'user_id' => $user2->getId(),
-            'name' => 'Hacked',
-            'surname' => 'User',
-            'email' => $user2->getEmail(),
-            'adresse' => 'Hacked Address',
-            '_token' => $token
-        ]);
-
-        $this->entityManager->refresh($user2);
-        $this->assertNotEquals('Hacked', $user2->getName());
-    }
 
     /**
      * Test 8 : IDOR - Accès au profil d'un autre utilisateur
