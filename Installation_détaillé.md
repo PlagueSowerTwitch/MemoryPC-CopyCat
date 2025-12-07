@@ -36,6 +36,9 @@ extension=pdo_pgsql
 extension=pgsql
 extension=tokenizer
 extension=xml
+extension=pdo_mysql
+extension=pdo_sqlite
+extension=pdo_mysql
 ```
 
 #### Installation de Composer
@@ -124,6 +127,16 @@ En cas d'erreur, essayez :
 
 ```bash
 npm install --legacy-peer-deps
+```
+
+### 4. Installer File loader et Regénérer les assets
+
+```bash
+npm install file-loader@^6.0.0 --save-dev
+```
+
+```bash
+npm run dev
 ```
 
 ## 🗄️ Configuration de la base de données
